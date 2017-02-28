@@ -60,7 +60,7 @@ void make_mine(void) {
 }
 
 void make_number(void) {
-	int i, j, k;
+	int i, j;
 	int number;
 	for (i = 0; i < HEIGHT; i++) {
 		for (j = 0; j < WIDTH; j++) {
@@ -120,7 +120,7 @@ void update_map(void) {
 	for (i = 0; i < HEIGHT; i++) {
 		for (j = 0; j < WIDTH; j++) {
 			if (open[i][j] == 1) {
-				map[i][j] == real[i][j];
+				map[i][j] = real[i][j];
 			}
 		}
 	}
