@@ -218,11 +218,11 @@ int select_box(int input) {
 	}
 	else if (input == 'f')
 	{
-		if (map[position.y][position.x] == 10) 
+		if (map[position.y][position.x] == 10)
 		{
 			map[position.y][position.x] = real[position.x][position.y];
 		}
-		else 
+		else
 		{
 			map[position.y][position.x] = 10;
 		}
@@ -232,23 +232,23 @@ int select_box(int input) {
 void move_current_position(int way) {
 	if (way == UP) {
 		position.y--;
-		if (position.y == 0)
-			position.y = 1;
+		if (position.y == 2)
+			position.y = 3;
 	}
 	else if (way == DOWN) {
 		position.y++;
-		if (position.y == 21)
-			position.y = 20;
+		if (position.y == 23)
+			position.y = 22;
 	}
 	else if (way == LEFT) {
 		position.x--;
-		if (position.x == 0)
-			position.x = 1;
+		if (position.x == 1)
+			position.x = 2;
 	}
 	else if (way == RIGHT) {
 		position.x++;
-		if (position.x == 21)
-			position.x = 20;
+		if (position.x == 22)
+			position.x = 21;
 	}
 }
 
@@ -262,6 +262,6 @@ void game_over(void) {
 }
 
 int main(void) {
-	position.x = 1;
-	position.y = 1;
+	position.x = 2;
+	position.y = 3;
 }
