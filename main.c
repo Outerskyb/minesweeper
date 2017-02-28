@@ -14,6 +14,7 @@
 int map[WIDTH][HEIGHT];//보여주는것
 int real[WIDTH][HEIGHT];//실제맵
 int open[WIDTH][HEIGHT];//open여부
+
 int move;
 int number_of_mine;
 
@@ -60,7 +61,7 @@ void make_mine(void) {
 }
 
 void make_number(void) {
-	int i, j;
+	int i, j, k;
 	int number;
 	for (i = 0; i < HEIGHT; i++) {
 		for (j = 0; j < WIDTH; j++) {
@@ -125,6 +126,7 @@ void update_map(void) {
 		}
 	}
 }
+
 void show_map(void) { //맵표현 gotoxy
 					  /*
 					  매직넘버
@@ -139,6 +141,7 @@ void show_map(void) { //맵표현 gotoxy
 					  8:숫자８
 					  9:지뢰
 					  10:깃발
+					  11:오픈안된거
 					  */
 	int i, j;
 
@@ -158,7 +161,7 @@ void show_map(void) { //맵표현 gotoxy
 			printf("┃"); //메인창 테두리
 			for (j = 0; j < WIDTH; j++) { //메인창 너비
 				if (map[i][j] == 0) {
-					printf("　");//벽
+					printf("□");//벽
 				}
 				else if (map[i][j] == 1) {
 					printf("１");//전각문자
@@ -190,6 +193,9 @@ void show_map(void) { //맵표현 gotoxy
 				else if (map[i][j] == 10) {
 					printf("▶");//전각문자
 				}
+				else if (map[i][j] == 11) {
+					printf("■");//전각문자
+				}
 			}
 			printf("┃");// 테두리
 			if (i == 4) {
@@ -212,17 +218,17 @@ void show_map(void) { //맵표현 gotoxy
 int select_box(int input) {
 	if (input == ' ')
 	{
-		if (map[position.x][position.y] == 9)
+		if (real[position.x][position.y] == 9)
 			return 0;
 		else return 1;
 	}
 	else if (input == 'f')
 	{
-		if (map[position.y][position.x] == 10)
+		if (map[position.y][position.x] == 10) 
 		{
-			map[position.y][position.x] = real[position.x][position.y];
+			map[position.y][position.x] = 11;
 		}
-		else
+		else 
 		{
 			map[position.y][position.x] = 10;
 		}
@@ -232,23 +238,23 @@ int select_box(int input) {
 void move_current_position(int way) {
 	if (way == UP) {
 		position.y--;
-		if (position.y == 2)
-			position.y = 3;
+		if (position.y == 0)
+			position.y = 1;
 	}
 	else if (way == DOWN) {
 		position.y++;
-		if (position.y == 23)
-			position.y = 22;
+		if (position.y == 21)
+			position.y = 20;
 	}
 	else if (way == LEFT) {
 		position.x--;
-		if (position.x == 1)
-			position.x = 2;
+		if (position.x == 0)
+			position.x = 1;
 	}
 	else if (way == RIGHT) {
 		position.x++;
-		if (position.x == 22)
-			position.x = 21;
+		if (position.x == 21)
+			position.x = 20;
 	}
 }
 
@@ -262,6 +268,6 @@ void game_over(void) {
 }
 
 int main(void) {
-	position.x = 2;
-	position.y = 3;
+	position.x = 1;
+	position.y = 1;
 }
