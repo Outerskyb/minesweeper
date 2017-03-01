@@ -228,42 +228,35 @@ void show_map(void) { //맵표현 gotoxy
 	}
 }
 
-void game_over(void) {
+int game_over(void) {
 	init_map();
 	show_map();
 	gotoxy((WIDTH + 7) / 2, (HEIGHT + 1) / 2);
 	printf("Game Over");
+	return 1;
+}
+
+int clear_check(void) {
+	int i, j,cnt=0;
+	for (i = 0; i < HEIGHT; i++) {
+		for (j = 0; j < WIDTH; j++) {
+			if (open[i][j] == 1) {
+				cnt++;
+			}
+		}
+	}
+	if (cnt == number_of_mine) {
+		init_map();
+		show_map();
+		gotoxy((WIDTH + 9) / 2, (HEIGHT + 1) / 2);
+		printf("Clear!");
+		return 1;
+	}
+	
 }
 
 void open_box(int i, int j, int k) {
 	open[i][j] = 1;
-	if (j != WIDTH - 1 && real[i][j + 1] != 9) {
-		open[i][j + 1] = 1;
-	}if (j != 0 && real[i][j - 1] != 9) {
-		open[i][j - 1] = 1;
-	}
-	if (i != HEIGHT - 1) {
-		if (real[i + 1][j] != 9) {
-			open[i + 1][j] = 1;
-		}
-		if (j != WIDTH - 1 && real[i + 1][j + 1] != 9) {
-			open[i + 1][j + 1] = 1;
-		}
-		if (j != 0 && real[i + 1][j - 1] != 9) {
-			open[i + 1][j - 1] = 1;
-		}
-	}
-	if (i != 0) {
-		if (real[i - 1][j] != 9) {
-			open[i - 1][j] = 1;
-		}
-		if (j != WIDTH - 1 && real[i - 1][j + 1] != 9) {
-			open[i - 1][j + 1] = 1;
-		}
-		if (j != 0 && real[i - 1][j - 1] != 9) {
-			open[i - 1][j - 1] = 1;
-		}
-	}
 	if (real[i][j + 1] == 0 && j != WIDTH - 1 && k != 3 && open[i][j + 1] != 1) {
 		open_box(i, j + 1, 1);
 	}
@@ -276,14 +269,47 @@ void open_box(int i, int j, int k) {
 	if (real[i][j - 1] == 0 && j != 0 && k != 1 && open[i][j - 1] != 1) {
 		open_box(i, j - 1, 3);
 	}
+	if (real[i][j] == 0) {
+		if (j != WIDTH - 1 && real[i][j + 1] != 9) {
+			open[i][j + 1] = 1;
+		}if (j != 0 && real[i][j - 1] != 9) {
+			open[i][j - 1] = 1;
+		}
+		if (i != HEIGHT - 1) {
+			if (real[i + 1][j] != 9) {
+				open[i + 1][j] = 1;
+			}
+			if (j != WIDTH - 1 && real[i + 1][j + 1] != 9) {
+				open[i + 1][j + 1] = 1;
+			}
+			if (j != 0 && real[i + 1][j - 1] != 9) {
+				open[i + 1][j - 1] = 1;
+			}
+		}
+		if (i != 0) {
+			if (real[i - 1][j] != 9) {
+				open[i - 1][j] = 1;
+			}
+			if (j != WIDTH - 1 && real[i - 1][j + 1] != 9) {
+				open[i - 1][j + 1] = 1;
+			}
+			if (j != 0 && real[i - 1][j - 1] != 9) {
+				open[i - 1][j - 1] = 1;
+			}
+		}
+	}
+	
 }
 
-void select_box(int input) {
+int select_box(int input) {
 	if (input == ' ')
 	{
-		if (real[position.y][position.x] == 9)
+		if (real[position.y][position.x] == 9) {
 			game_over();
+			return 1;
+		}
 		else open_box(position.y, position.x, 6);
+		
 	}
 	else if (input == 'f')
 	{
@@ -296,6 +322,7 @@ void select_box(int input) {
 			map[position.y][position.x] = 10;
 		}
 	}
+	return 0;
 }
 
 void move_current_position(int way) {
@@ -331,10 +358,15 @@ int main(void) {
 	while (1) {
 		key = getch();
 		if (key == ' ' || key == 'f') {
-			select_box(key);
+			if (select_box(key) == 1) {
+				goto end;
+			}
 			update_map();
 			map[position.y][position.x] = 12;
 			show_map();
+			if (clear_check() == 1) {
+				goto end;
+			}
 			continue;
 		}
 		update_map();
@@ -346,4 +378,6 @@ int main(void) {
 		}
 		show_map();
 	}
+	end:
+	return 0;
 }
