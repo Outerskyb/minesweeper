@@ -59,7 +59,7 @@ void make_mine(void) {
 	}
 	int x = rand() % WIDTH;
 	int y = rand() % HEIGHT;
-	if (real[y][x] == 0) {
+	if (real[y][x] == 0 && (position.x != x && position.y != y)) {
 		real[y][x] = 9;
 		count++;
 	}
@@ -237,7 +237,7 @@ int game_over(void) {
 }
 
 int clear_check(void) {
-	int i, j,cnt=0;
+	int i, j, cnt = 0;
 	for (i = 0; i < HEIGHT; i++) {
 		for (j = 0; j < WIDTH; j++) {
 			if (open[i][j] == 1) {
@@ -252,7 +252,7 @@ int clear_check(void) {
 		printf("Clear!");
 		return 1;
 	}
-	
+
 }
 
 void open_box(int i, int j, int k) {
@@ -298,7 +298,7 @@ void open_box(int i, int j, int k) {
 			}
 		}
 	}
-	
+
 }
 
 int select_box(int input) {
@@ -309,7 +309,7 @@ int select_box(int input) {
 			return 1;
 		}
 		else open_box(position.y, position.x, 6);
-		
+
 	}
 	else if (input == 'f')
 	{
@@ -346,7 +346,7 @@ void move_current_position(int way) {
 }
 
 int main(void) {
-	int key,check=0;
+	int key, check = 0;
 	srand(time(NULL));
 	position.x = position.y = 0;
 	remove_cursor();
@@ -382,6 +382,6 @@ int main(void) {
 		}
 		show_map();
 	}
-	end:
+end:
 	return 0;
 }
