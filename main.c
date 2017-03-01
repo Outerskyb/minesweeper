@@ -1,11 +1,15 @@
+#pragma warning(disable:4996)
+
 #include<stdio.h>
 #include<stdlib.h>
+#include<string.h>
 #include<time.h>
 #include<conio.h>
 #include<Windows.h>
 
 #define WIDTH 20
 #define HEIGHT 20
+
 #define UP 72
 #define LEFT 75
 #define RIGHT 77
@@ -15,8 +19,7 @@ int map[WIDTH][HEIGHT];//보여주는것
 int real[WIDTH][HEIGHT];//실제맵
 int open[WIDTH][HEIGHT];//open여부
 
-int move;
-int number_of_mine;
+int number_of_mine = 51;
 
 typedef struct _op {
 	int x;
@@ -33,9 +36,14 @@ void remove_cursor(void) {
 }
 
 void init_map(void) {
-	memset(map, 0, sizeof(map));
-	memset(real, 0, sizeof(real));
-	memset(open, 0, sizeof(open));
+	int i, j;
+	for (i = 0; i < HEIGHT; i++) {
+		for (j = 0; j < WIDTH; j++) {
+			map[i][j] = 0;
+			open[i][j] = 0;
+			real[i][j] = 0;
+		}
+	}
 }
 
 void gotoxy(int x, int y)//gotoxy
@@ -55,13 +63,11 @@ void make_mine(void) {
 		real[y][x] = 9;
 		count++;
 	}
-	else {
-		make_mine();
-	}
+	make_mine();
 }
 
 void make_number(void) {
-	int i, j, k;
+	int i, j;
 	int number;
 	for (i = 0; i < HEIGHT; i++) {
 		for (j = 0; j < WIDTH; j++) {
@@ -120,8 +126,11 @@ void update_map(void) {
 	int i, j;
 	for (i = 0; i < HEIGHT; i++) {
 		for (j = 0; j < WIDTH; j++) {
-			if (open[i][j] == 1) {
+			if (open[i][j] == 1 && real[i][j] != 9) {
 				map[i][j] = real[i][j];
+			}
+			else {
+				map[i][j] = 11;
 			}
 		}
 	}
@@ -142,6 +151,7 @@ void show_map(void) { //맵표현 gotoxy
 					  9:지뢰
 					  10:깃발
 					  11:오픈안된거
+					  12:유저
 					  */
 	int i, j;
 
@@ -194,12 +204,15 @@ void show_map(void) { //맵표현 gotoxy
 					printf("▶");//전각문자
 				}
 				else if (map[i][j] == 11) {
-					printf("■");//전각문자
+					printf("◆");//전각문자
+				}
+				else if (map[i][j] == 12) {
+					printf("●");//전각문자
 				}
 			}
 			printf("┃");// 테두리
 			if (i == 4) {
-				printf("moves:%d", move);
+
 			}
 			printf("\n");
 		}
@@ -215,20 +228,70 @@ void show_map(void) { //맵표현 gotoxy
 	}
 }
 
-int select_box(int input) {
+void game_over(void) {
+	init_map();
+	show_map();
+	gotoxy((WIDTH + 7) / 2, (HEIGHT + 1) / 2);
+	printf("Game Over");
+}
+
+void open_box(int i, int j, int k) {
+	open[i][j] = 1;
+	if (j != WIDTH - 1 && real[i][j + 1] != 9) {
+		open[i][j + 1] = 1;
+	}if (j != 0 && real[i][j - 1] != 9) {
+		open[i][j - 1] = 1;
+	}
+	if (i != HEIGHT - 1) {
+		if (real[i + 1][j] != 9) {
+			open[i + 1][j] = 1;
+		}
+		if (j != WIDTH - 1 && real[i + 1][j + 1] != 9) {
+			open[i + 1][j + 1] = 1;
+		}
+		if (j != 0 && real[i + 1][j - 1] != 9) {
+			open[i + 1][j - 1] = 1;
+		}
+	}
+	if (i != 0) {
+		if (real[i - 1][j] != 9) {
+			open[i - 1][j] = 1;
+		}
+		if (j != WIDTH - 1 && real[i - 1][j + 1] != 9) {
+			open[i - 1][j + 1] = 1;
+		}
+		if (j != 0 && real[i - 1][j - 1] != 9) {
+			open[i - 1][j - 1] = 1;
+		}
+	}
+	if (real[i][j + 1] == 0 && j != WIDTH - 1 && k != 3 && open[i][j + 1] != 1) {
+		open_box(i, j + 1, 1);
+	}
+	if (real[i + 1][j] == 0 && i != HEIGHT - 1 && k != 4 && open[i + 1][j] != 1) {
+		open_box(i + 1, j, 2);
+	}
+	if (real[i - 1][j] == 0 && i != 0 && k != 2 && open[i - 1][j] != 1) {
+		open_box(i - 1, j, 4);
+	}
+	if (real[i][j - 1] == 0 && j != 0 && k != 1 && open[i][j - 1] != 1) {
+		open_box(i, j - 1, 3);
+	}
+}
+
+void select_box(int input) {
 	if (input == ' ')
 	{
-		if (real[position.x][position.y] == 9)
-			return 0;
-		else return 1;
+		if (real[position.y][position.x] == 9)
+			game_over();
+		else open_box(position.y, position.x, 6);
 	}
 	else if (input == 'f')
 	{
-		if (map[position.y][position.x] == 10) 
+		if (map[position.y][position.x] == 10)
 		{
 			map[position.y][position.x] = 11;
 		}
-		else 
+		else
 		{
 			map[position.y][position.x] = 10;
 		}
@@ -237,37 +300,50 @@ int select_box(int input) {
 
 void move_current_position(int way) {
 	if (way == UP) {
-		position.y--;
-		if (position.y == 0)
-			position.y = 1;
+		if (position.y != 0)
+			position.y--;
 	}
 	else if (way == DOWN) {
-		position.y++;
-		if (position.y == 21)
-			position.y = 20;
+		if (position.y != HEIGHT - 1)
+			position.y++;
 	}
 	else if (way == LEFT) {
-		position.x--;
-		if (position.x == 0)
-			position.x = 1;
+		if (position.x != 0)
+			position.x--;
 	}
 	else if (way == RIGHT) {
-		position.x++;
-		if (position.x == 21)
-			position.x = 20;
+		if (position.x != WIDTH - 1)
+			position.x++;
 	}
-}
 
-void game_over(void) {
-	init_map();
-	show_map();
-	gotoxy((WIDTH + 7) / 2, (HEIGHT + 1) / 2);
-	printf("Game Over");
-	gotoxy((WIDTH + 7) / 2, ((HEIGHT + 1) / 2) + 1);
-	printf("move :%d", move);
 }
 
 int main(void) {
-	position.x = 1;
-	position.y = 1;
+	int key;
+	srand(time(NULL));
+	position.x = position.y = 0;
+	remove_cursor();
+	init_map();
+	make_mine();
+	make_number();
+	map[position.y][position.x] = 12;
+	show_map();
+	while (1) {
+		key = getch();
+		if (key == ' ' || key == 'f') {
+			select_box(key);
+			update_map();
+			map[position.y][position.x] = 12;
+			show_map();
+			continue;
+		}
+		update_map();
+		key = getch();
+		if (key == UP || key == DOWN || key == RIGHT || key == LEFT) {
+			move_current_position(key);
+			map[position.y][position.x] = 12;
+			show_map();
+		}
+		show_map();
+	}
 }
