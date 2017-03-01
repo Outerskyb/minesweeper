@@ -19,7 +19,7 @@ int map[WIDTH][HEIGHT];//보여주는것
 int real[WIDTH][HEIGHT];//실제맵
 int open[WIDTH][HEIGHT];//open여부
 
-int number_of_mine = 51;
+int number_of_mine = 65;
 
 typedef struct _op {
 	int x;
@@ -229,8 +229,6 @@ void show_map(void) { //맵표현 gotoxy
 }
 
 int game_over(void) {
-	init_map();
-	show_map();
 	gotoxy((WIDTH + 7) / 2, (HEIGHT + 1) / 2);
 	printf("Game Over");
 	return 1;
@@ -240,18 +238,17 @@ int clear_check(void) {
 	int i, j, cnt = 0;
 	for (i = 0; i < HEIGHT; i++) {
 		for (j = 0; j < WIDTH; j++) {
-			if (open[i][j] == 1) {
+			if (open[i][j] == 0) {
 				cnt++;
 			}
 		}
 	}
 	if (cnt == number_of_mine) {
-		init_map();
-		show_map();
 		gotoxy((WIDTH + 9) / 2, (HEIGHT + 1) / 2);
 		printf("Clear!");
 		return 1;
 	}
+	return 0;
 
 }
 
