@@ -346,18 +346,22 @@ void move_current_position(int way) {
 }
 
 int main(void) {
-	int key;
+	int key,check=0;
 	srand(time(NULL));
 	position.x = position.y = 0;
 	remove_cursor();
 	init_map();
-	make_mine();
-	make_number();
+	update_map();
 	map[position.y][position.x] = 12;
 	show_map();
 	while (1) {
 		key = getch();
 		if (key == ' ' || key == 'f') {
+			if (check == 0) {
+				make_mine();
+				make_number();
+				check++;
+			}
 			if (select_box(key) == 1) {
 				goto end;
 			}
